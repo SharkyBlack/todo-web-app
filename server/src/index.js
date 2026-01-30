@@ -24,6 +24,10 @@ app.get("/api/test/protected", protect, (req, res) => {
   });
 });
 
+const boardRoutes = require("./routes/boardRoutes");
+app.use("/api/boards", boardRoutes);
+
+
 
 const PORT = process.env.PORT || 5000;
 
