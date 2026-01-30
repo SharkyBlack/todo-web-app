@@ -37,7 +37,7 @@ export default function Dashboard() {
       setLoadingBoards(true);
 
       const res = await api.get("/boards");
-      const data = Array.isArray(res.data) ? res.data : [];
+      const data = Array.isArray(res.data.boards) ? res.data.boards : [];
 
       setBoards(data);
 
@@ -121,7 +121,9 @@ export default function Dashboard() {
         description: editDesc.trim(),
       });
 
-      setTodos((prev) => prev.map((t) => (t._id === editTodoId ? res.data : t)));
+      setTodos((prev) =>
+        prev.map((t) => (t._id === editTodoId ? res.data : t)),
+      );
       closeEditModal();
     } catch (error) {
       setErr(error?.response?.data?.message || "Failed to update todo");
@@ -149,9 +151,9 @@ export default function Dashboard() {
       const res = await api.post("/boards", { name });
 
       // ✅ functional state update avoids stale boards issue
-      setBoards((prev) => [res.data, ...prev]);
+      setBoards((prev) => [res.data.board, ...prev]); // Access the .board property
+      setSelectedBoard(res.data.board);
 
-      setSelectedBoard(res.data);
       setBoardName("");
       setTodos([]); // optional: clear until fetchTodos runs
     } catch (error) {
@@ -342,7 +344,10 @@ export default function Dashboard() {
                   value={todoDesc}
                   onChange={(e) => setTodoDesc(e.target.value)}
                 />
-                <button className="bg-black text-white rounded-lg font-semibold hover:opacity-90">
+                <button
+                  disabled={!selectedBoard?._id} // Disable if no board is selected
+                  className={`bg-black text-white rounded-lg font-semibold hover:opacity-90 ${!selectedBoard?._id ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
                   Add Todo
                 </button>
               </form>
